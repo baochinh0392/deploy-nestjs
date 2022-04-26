@@ -2,7 +2,7 @@ name: Deploy to Staging SG
 
 on:
   push:
-    branches: [staging]
+    branches: [master]
 
 jobs:
   lint-and-tests:
