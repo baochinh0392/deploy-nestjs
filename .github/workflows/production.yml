@@ -1,4 +1,4 @@
-name: Deploy to Staging SG
+name: Deploy to Production
 
 on:
   workflow_dispatch:
