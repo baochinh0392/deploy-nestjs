@@ -1,97 +1,97 @@
-name: Deploy to Staging
+# name: Deploy to Staging
 
-on:
-  push:
-    branches: [master]
+# on:
+#   push:
+#     branches: [master]
 
-jobs:
-  lint-and-tests:
-    name: Check lint and tests source
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [12]
+# jobs:
+#   lint-and-tests:
+#     name: Check lint and tests source
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         node: [12]
 
-    steps:
-      - name: Checkout codebase
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout codebase
+#         uses: actions/checkout@v2
 
-      - name: Use Node.js version ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
+#       - name: Use Node.js version ${{ matrix.node-version }}
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: ${{ matrix.node-version }}
 
-      - name: Install packages, format, lint
-        run: |
-          yarn install
-          yarn format
-          yarn lint
+#       - name: Install packages, format, lint
+#         run: |
+#           yarn install
+#           yarn format
+#           yarn lint
 
-      # - name: Testing
-      #   run: |
-      #     yarn test:e2e
+#       # - name: Testing
+#       #   run: |
+#       #     yarn test:e2e
 
-  build-and-deploy:
-    name: Bundle source, push image and deploy AWS
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [12]
+#   build-and-deploy:
+#     name: Bundle source, push image and deploy AWS
+#     runs-on: ubuntu-latest
+#     strategy:
+#       matrix:
+#         node: [12]
 
-    steps:
-      - name: Checkout codebase
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Checkout codebase
+#         uses: actions/checkout@v2
 
-      - name: Use Node.js version ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
+#       - name: Use Node.js version ${{ matrix.node-version }}
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: ${{ matrix.node-version }}
 
-      - name: Install packages
-        run: |
-          yarn install
+#       - name: Install packages
+#         run: |
+#           yarn install
 
-      - name: Bundle source
-        run: |
-          yarn prebuild
-          yarn build
+#       - name: Bundle source
+#         run: |
+#           yarn prebuild
+#           yarn build
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.STAG_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.STAG_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.STAG_AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.STAG_AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-southeast-1
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: app_nestjs
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+#       - name: Build, tag, and push image to Amazon ECR
+#         id: build-image
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           ECR_REPOSITORY: app_nestjs
+#           IMAGE_TAG: ${{ github.sha }}
+#         run: |
+#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+#           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@master
-        with:
-          task-definition: task-definition.json
-          container-name: app_nestjs
-          image: ${{ steps.build-image.outputs.image }}
-          environment-variables: |
-            NODE_ENV=dev
+#       - name: Fill in the new image ID in the Amazon ECS task definition
+#         id: task-def
+#         uses: aws-actions/amazon-ecs-render-task-definition@master
+#         with:
+#           task-definition: task-definition.json
+#           container-name: app_nestjs
+#           image: ${{ steps.build-image.outputs.image }}
+#           environment-variables: |
+#             NODE_ENV=dev
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: deploy-nests-service
-          cluster: deploy-nestjs
-          wait-for-service-stability: true
+#       - name: Deploy Amazon ECS task definition
+#         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+#         with:
+#           task-definition: ${{ steps.task-def.outputs.task-definition }}
+#           service: deploy-nests-service
+#           cluster: deploy-nestjs
+#           wait-for-service-stability: true
