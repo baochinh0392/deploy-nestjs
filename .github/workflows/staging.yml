@@ -41,6 +41,8 @@ jobs:
           github_token: ${{ secrets.STAG_GITHUB_TOKEN }}
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
+        run: |
+          echo "GH_EVENT: ${{ github.event }}"
         with:
           tag: ${{ steps.tag_version.outputs.new_tag }}${{ github.event.pull_request.head.ref }}
           name: Release ${{ steps.tag_version.outputs.new_tag }}
