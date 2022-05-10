@@ -8,6 +8,6 @@ export class AppController {
   @Get()
   @Header('Content-Type', 'text/html')
   getHello(): {name: string} {
-    return {name: 'features_F_ne'};
+    return {name: 'features_new_ne'};
   }
 }
