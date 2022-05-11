@@ -1,10 +1,11 @@
 name: Deploy to Dev1
 
-on: workflow_dispatch
-  inputs:
-    run-migrate:
-      type: boolean
-      description: Flag 
+on:
+  workflow_dispatch:
+    inputs:
+      run-migrate:
+        type: boolean
+        description: Flag 
 
 jobs:
   lint-and-tests:
