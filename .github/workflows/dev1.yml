@@ -1,6 +1,10 @@
 name: Deploy to Dev1
 
 on: workflow_dispatch
+  inputs:
+    run-migrate:
+      type: boolean
+      description: Flag 
 
 jobs:
   lint-and-tests:
@@ -33,6 +37,9 @@ jobs:
         node: [12]
 
     steps:
+      - name: run migrate
+        run: echo "${{github.event.inputs.run-migrate}}"
+
       - name: Checkout codebase
         uses: actions/checkout@v2
 
