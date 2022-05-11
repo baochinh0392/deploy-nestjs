@@ -54,4 +54,4 @@ jobs:
         run: |
           eval `ssh-agent -s`
           ssh-add - <<< "${{ secrets.DEV1_VM_PRIVATE_KEY }}"
-          ssh -o StrictHostKeyChecking=no ubuntu@ec2-13-251-50-102.ap-southeast-1.compute.amazonaws.com -- "cd deploy-nestjs && sudo yarn build && sudo pm2 restart dist/main.js"
+          ssh -o StrictHostKeyChecking=no ubuntu@ec2-13-251-50-102.ap-southeast-1.compute.amazonaws.com -- "cd deploy-nestjs && git checkout ${{ github.head_ref || github.ref_name }} && sudo yarn build && sudo pm2 restart dist/main.js"
