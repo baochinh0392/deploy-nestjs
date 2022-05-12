@@ -65,5 +65,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@ec2-13-251-50-102.ap-southeast-1.compute.amazonaws.com -- "cd deploy-nestjs\
           && touch .env\
           && echo 'ENV_1=ne' >> .env\
+          && echo 'ENV_2=nzo' >> .env\
           && git fetch && git checkout ${{ github.head_ref || github.ref_name }}\
           && sudo yarn build && sudo pm2 restart dist/main.js"
